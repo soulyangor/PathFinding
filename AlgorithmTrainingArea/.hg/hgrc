@@ -1,0 +1,6 @@
+# example repository config (see "hg help config" for more info)
+
+[paths]
+default = http://192.168.40.254:17083/hgweb.cgi/AlgorithmTrainingArea
+default-push = http://192.168.40.254:17083/hgweb.cgi/AlgorithmTrainingArea
+
