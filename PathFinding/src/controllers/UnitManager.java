@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controllers;
 
 import advancedpathfinding.Cell;
@@ -10,11 +5,11 @@ import grid.Grid;
 import advancedpathfinding.Leaf;
 import java.util.ArrayList;
 import java.util.List;
-import td.unit.Unit;
+import units.Unit;
 
 /**
  *
- * @author Sokolov@ivc.org
+ * @author Хозяин
  */
 public class UnitManager {
 

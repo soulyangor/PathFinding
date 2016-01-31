@@ -1,17 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package pathfinding;
+package main;
 
 import advancedpathfinding.Algorithm;
 import advancedpathfinding.Cell;
-import advancedpathfinding.Graph;
 import grid.Grid;
 import advancedpathfinding.Leaf;
 import controllers.MovingManager;
 import controllers.UnitManager;
+import grid.elements.GroundType;
+import grid.elements.Mesh;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -20,13 +16,11 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import td.gamefield.GroundType;
-import td.gamefield.Mesh;
-import td.unit.Unit;
+import units.Unit;
 
 /**
  *
- * @author Sokolov@ivc.org
+ * @author Хозяин
  */
 public class DrawPanel extends JComponent implements Runnable {
 

@@ -1,36 +1,25 @@
-/*
- Информационно-вычислительный центр
- космодрома Байконур
- */
-package td.gamefield;
+package grid.elements;
 
-import java.util.List;
 import java.util.Objects;
-import td.unit.Unit;
+import units.Unit;
 
 /**
  *
- * @author alextim
+ * @author Хозяин
  */
 public class Mesh {
-  //-------------------Logger---------------------------------------------------
 
-  //-------------------Constants------------------------------------------------
-    //-------------------Fields---------------------------------------------------
     private final GroundType type;
     private final int altitude;
     private final double expense;
     private Unit unit;
-    private List<Unit> content;
 
-  //-------------------Constructors---------------------------------------------
     public Mesh(GroundType type, int altitude, double expense) {
         this.type = type;
         this.altitude = altitude;
         this.expense = expense;
     }
 
-    //-------------------Getters and setters--------------------------------------
     public GroundType getType() {
         return type;
     }
@@ -51,17 +40,14 @@ public class Mesh {
         this.unit = unit;
     }
 
-    public List<Unit> getContent() {
-        return content;
-    }
-    //-------------------Methods--------------------------------------------------
     /**
      * Перегрузка метода equals класса Object.
      *
      * @param otherObject - сравниваемый на эквивалентность объект
      * @return если объекты совпадают, то возвращает true.
-     * 
-     * Сравнивает только тип, высоту и цену. Наличие или отсутствие юнитов игнорируется.
+     *
+     * Сравнивает только тип, высоту и цену. Наличие или отсутствие юнитов
+     * игнорируется.
      */
     @Override
     public boolean equals(Object otherObject) {

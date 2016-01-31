@@ -3,8 +3,8 @@ package advancedpathfinding;
 import java.util.LinkedHashMap;
 
 /**
- * Класс для хранения точек пути и самого пути Created by Вячеслав on
- * 11.09.2015.
+ *
+ * @author Хозяин
  */
 public class Cell {
 

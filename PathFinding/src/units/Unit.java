@@ -1,8 +1,4 @@
-/*
- Информационно-вычислительный центр
- космодрома Байконур
- */
-package td.unit;
+package units;
 
 import grid.Grid;
 import java.awt.BasicStroke;
@@ -11,7 +7,7 @@ import java.awt.Graphics2D;
 
 /**
  *
- * @author rmo
+ * @author Хозяин
  */
 public class Unit {
 

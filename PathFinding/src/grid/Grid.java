@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package grid;
 
+import grid.elements.AdvancedMesh;
 import advancedpathfinding.Cell;
 import advancedpathfinding.Node;
 import controllers.MovingManager;
@@ -12,13 +8,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-import td.gamefield.GroundType;
-import td.gamefield.Mesh;
-import td.unit.Unit;
+import grid.elements.GroundType;
+import grid.elements.Mesh;
+import units.Unit;
 
 /**
  *
- * @author Sokolov@ivc.org
+ * @author Хозяин
  */
 public class Grid {
 
