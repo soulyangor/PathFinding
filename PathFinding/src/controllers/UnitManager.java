@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package controllers;
 
 import advancedpathfinding.Cell;
@@ -9,7 +14,7 @@ import units.Unit;
 
 /**
  *
- * @author Хозяин
+ * @author Sokolov@ivc.org
  */
 public class UnitManager {
 
@@ -19,10 +24,11 @@ public class UnitManager {
     private static final double MIN_VALUE = 10e-6;
 
     private final PathController pathController;
-    private boolean redef = false;
 
+    private boolean redef = false;
     private Grid grid;
     private long priority;
+    private List<Cell> cells;
 
     public UnitManager(Unit unit, Grid grid) {
         this.unit = unit;
@@ -35,6 +41,15 @@ public class UnitManager {
 
     public void setRedef() {
         this.redef = true;
+    }
+
+    /**
+     * Устанавливает набор точек положения приоритетного юнита
+     *
+     * @param cells
+     */
+    public void setCells(List<Cell> cells) {
+        this.cells = cells;
     }
 
     public long getPriority() {
@@ -61,6 +76,15 @@ public class UnitManager {
     public Cell getCell() {
         return pathController.getCell();
     }
+    
+    public boolean isArrivedToAim(){
+        return pathController.isArrivedToAim();
+    }
+
+    //Временный
+    public Cell getAvailableCell() {
+        return pathController.availableCell(12);
+    }
 
     public void addAim(Cell cell) {
         if (!MovingManager.isReady()) {
@@ -77,30 +101,26 @@ public class UnitManager {
         }
         Cell cell = pathController.getCell();
         if (redef) {
-            if (cell != null) {
-                //pathController.redef();
-            } else {
-                double d = 0.5;
-                double min = 10e6;
-                System.out.println("ID:" + id);
-                for (Cell c : unitBorder()) {
-                    pathController.distPath(unit, c);
-                    d = pathController.getLength();
-                    System.out.print("(" + c.key + ")  d = " + d);
-                    if ((d < min) && (d > 0)) {
-                        min = d;
-                        cell = c;
-                        System.out.print(" - yes");
-                    }
-                    System.out.println("");
-                }
-                if (cell != null) {
-                    System.out.println("Result: (" + cell.key + ")");
-                    pathController.distPath(unit, cell);
+            if (cell == null) {
+                Cell c = pathController.findNearPosition(cells);
+                pathController.distPath(c);
+                redef = false;
+                cells = null;
+                System.out.println("==================================");
+            } else if (!grid.isIgnoreWalkable(cell, unit)) {
+                System.out.println("CELL - " + cell.key);
+                System.out.println("REDEFINING EXECUTED");
+                pathController.redef();
+                if (pathController.getCell() == null) {
+                    System.out.println("-----------------------------");
+                    Cell c = pathController.findNearPosition(cells);
+                    pathController.distPath(c);
+                    redef = false;
+                    cells = null;
+                } else {
+                    System.out.println("REDEF_CELL - " + pathController.getCell().key);
                 }
             }
-            redef = false;
-            System.out.println("==================================");
         }
 
         if (pathController.isArrivedIntoCentrCell()) {
@@ -108,15 +128,11 @@ public class UnitManager {
         }
 
         cell = pathController.getCell();
-        if (cell != null) {
-            System.out.println("ID:" + id + " CELL: (" + cell.key + ")");
-        } else {
-            System.out.println("ID:" + id + " CELL: NULL");
-        }
 
         if (cell == null) {
             priority = id;
             redef = false;
+            cells = null;
             return;
         }
         defineAngle(cell);
@@ -124,13 +140,11 @@ public class UnitManager {
         if (grid.isAbsWalkable(unit)) {
             defineAngle(cell);
             unit.update();
+        } else if (grid.isIgnoreWalkable(unit)) {
+            manageLets();
         } else {
-            if (grid.isIgnoreWalkable(unit)) {
-                manageLets();
-            } else {
-                System.out.println("REDEFINING");
-                pathController.redef();
-            }
+            System.out.println("REDEFINING ITSELF");
+            pathController.redef();
         }
         grid.setUnit(unit);
     }
@@ -141,13 +155,28 @@ public class UnitManager {
             Unit u = manager.unit;
             if (MovingManager.isIgnore(u, unit)) {
                 manager.setRedef();
+                manager.setCells(getArea());
             }
         }
+    }
+
+    private List<Cell> getArea() {
+        int size = unit.getSize();
+        int x = getCell().x;
+        int y = getCell().y;
+        List<Cell> result = new ArrayList<>();
+        for (int i = x; i < x + size; i++) {
+            for (int j = y; j < y + size; j++) {
+                result.add(new Cell(i, j));
+            }
+        }
+        return result;
     }
 
     private List<Cell> unitBorder() {
         List<Cell> border = new ArrayList<>();
         int size = unit.getSize();
+        size = 1;
         int x = (int) (unit.getX() / grid.cellSize);
         int y = (int) (unit.getY() / grid.cellSize);
         for (int i = x - 1; i <= x + size; i++) {

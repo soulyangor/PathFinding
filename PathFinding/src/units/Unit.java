@@ -1,3 +1,7 @@
+/*
+ Информационно-вычислительный центр
+ космодрома Байконур
+ */
 package units;
 
 import grid.Grid;
@@ -7,7 +11,7 @@ import java.awt.Graphics2D;
 
 /**
  *
- * @author Хозяин
+ * @author rmo
  */
 public class Unit {
 

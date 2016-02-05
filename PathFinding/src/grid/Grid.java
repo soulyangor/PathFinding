@@ -1,20 +1,29 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package grid;
 
-import grid.elements.AdvancedMesh;
 import advancedpathfinding.Cell;
 import advancedpathfinding.Node;
 import controllers.MovingManager;
+import grid.elements.AdvancedMesh;
+import grid.elements.Field;
+import grid.elements.GroundType;
+import static grid.elements.GroundType.FOREST;
+import static grid.elements.GroundType.ROCKS;
+import static grid.elements.GroundType.WATER;
+import grid.elements.Mesh;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-import grid.elements.GroundType;
-import grid.elements.Mesh;
 import units.Unit;
 
 /**
  *
- * @author Хозяин
+ * @author Sokolov@ivc.org
  */
 public class Grid {
 
@@ -193,6 +202,7 @@ public class Grid {
     public boolean isAbsWalkable(Unit unit) {
         double x = unit.getX() + cellSize * Math.cos(unit.getAngle()) / 2;
         double y = unit.getY() + cellSize * Math.sin(unit.getAngle()) / 2;
+
         if (!isRelWalkable(x, y, unit.getSize())) {
             return false;
         }
@@ -233,6 +243,10 @@ public class Grid {
                     } else {
                         g2d.setColor(Color.PINK);
                     }
+                    g2d.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                }
+                if (map[i][j].getUnit() != null) {
+                    g2d.setColor(Color.GRAY);
                     g2d.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                 }
                 g2d.setColor(Color.BLACK);

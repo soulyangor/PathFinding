@@ -1,7 +1,12 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package advancedpathfinding;
 
-import grid.Field;
 import grid.Grid;
+import grid.elements.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,7 +15,7 @@ import units.Unit;
 
 /**
  *
- * @author Хозяин
+ * @author Sokolov@ivc.org
  */
 public class Algorithm {
 
@@ -256,6 +261,109 @@ public class Algorithm {
         return curCell;
     }
 
+    public static Cell searchNearPosition(int x, int y, Unit u, List<Cell> cells) {
+        if (grid == null) {
+            throw new IllegalStateException("Algorithm не готов для работы, "
+                    + "задайте ему поле grid при помощи метода setGrid(Grid grid)");
+        }
+        Map<String, Cell> openPoints = new LinkedHashMap<>();
+        Map<String, Cell> closePoints = new LinkedHashMap<>();
+        Cell newCell = new Cell(x, y);
+        Cell curCell;
+        newCell.calcF();
+        openPoints.put(newCell.key, newCell);
+        Cell result = null;
+        boolean complete = false;
+        while ((openPoints.size() > 0) && (!complete)) {
+            curCell = Algorithm.findPointByFmin(openPoints);
+            String key = curCell.key;
+            closePoints.put(key, curCell);
+            openPoints.remove(key);
+            for (Cell iter : getBorder(curCell)) {
+                int i = iter.x;
+                int j = iter.y;
+                int manageValue = Algorithm.manageLoopByMap(i, j, curCell,
+                        complete, u);
+                if (manageValue == 1) {
+                    continue;
+                }
+                if (manageValue == -1) {
+                    break;
+                }
+                if (canState(iter, u, cells)) {
+                    complete = true;
+                    result = iter;
+                }
+                Algorithm.manageLoopByPoints(i, j, curCell, openPoints, closePoints);
+            }
+        }
+        openPoints.clear();
+        closePoints.clear();
+        return result;
+    }
+
+    public static Cell searchAvailableDistance(int x, int y, int size, int dist) {
+        if (grid == null) {
+            throw new IllegalStateException("Algorithm не готов для работы, "
+                    + "задайте ему поле grid при помощи метода setGrid(Grid grid)");
+        }
+        Map<String, Cell> openPoints = new LinkedHashMap<>();
+        Map<String, Cell> closePoints = new LinkedHashMap<>();
+        Cell newCell = new Cell(x, y);
+        Cell curCell;
+        newCell.calcF();
+        openPoints.put(newCell.key, newCell);
+        Cell result = null;
+        boolean complete = false;
+        while ((openPoints.size() > 0) && (!complete)) {
+            curCell = Algorithm.findPointByFmin(openPoints);
+            String key = curCell.key;
+            closePoints.put(key, curCell);
+            openPoints.remove(key);
+            for (Cell iter : getBorder(curCell)) {
+                int i = iter.x;
+                int j = iter.y;
+                int manageValue = Algorithm.manageLoopByMap(i, j, curCell, size,
+                        complete);
+                if (manageValue == 1) {
+                    continue;
+                }
+                if (manageValue == -1) {
+                    break;
+                }
+                if (Math.sqrt((i - x) * (i - x) + (j - y) * (j - y)) > dist) {
+                    complete = true;
+                    result = iter;
+                }
+                Algorithm.manageLoopByPoints(i, j, curCell, openPoints, closePoints);
+            }
+        }
+        openPoints.clear();
+        closePoints.clear();
+        return result;
+    }
+
+    private static boolean canState(Cell cell, Unit u, List<Cell> cells) {
+        int size = u.getSize();
+        for (int i = cell.x; i < cell.x + size; i++) {
+            for (int j = cell.y; j < cell.y + size; j++) {
+                if (isConsist(i, j, cells)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isConsist(int x, int y, List<Cell> cells) {
+        for (Cell c : cells) {
+            if ((c.x == x) && (c.y == y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static Cell findPointByFmin(Map<String, Cell> list) {
         Cell current = null;
         double fMin = INFINITY;
@@ -370,6 +478,32 @@ public class Algorithm {
             newPoint.setCell(curCell);
             newPoint.setG(curCell.getG() + step);
             newPoint.calcH(x, y);
+            newPoint.calcF();
+            openList.put(key, newPoint);
+        }
+    }
+
+    private static void manageLoopByPoints(int i, int j, Cell curCell,
+            Map<String, Cell> openList, Map<String, Cell> closeList) {
+        String key = Integer.toString(i) + "|" + Integer.toString(j);
+        double step;
+        if (closeList.containsKey(key)) {
+            return;
+        }
+        if (openList.containsKey(key)) {
+            Cell tmp = openList.get(key);
+            step = ((curCell.x == tmp.x)
+                    || (curCell.y == tmp.y)) ? 1 : 1.41;
+            if (tmp.getG() > curCell.getG() + step) {
+                tmp.setCell(curCell);
+                tmp.setG(curCell.getG() + step);
+                tmp.calcF();
+            }
+        } else {
+            step = ((curCell.x == i) || (curCell.y == j)) ? 1 : 1.41;
+            Cell newPoint = new Cell(i, j);
+            newPoint.setCell(curCell);
+            newPoint.setG(curCell.getG() + step);
             newPoint.calcF();
             openList.put(key, newPoint);
         }

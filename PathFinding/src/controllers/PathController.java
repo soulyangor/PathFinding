@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package controllers;
 
 import advancedpathfinding.Algorithm;
@@ -5,8 +10,9 @@ import advancedpathfinding.Cell;
 import advancedpathfinding.Graph;
 import advancedpathfinding.Leaf;
 import advancedpathfinding.Node;
-import grid.Field;
 import grid.Grid;
+import grid.elements.Field;
+import java.util.List;
 import units.Unit;
 
 /**
@@ -31,6 +37,17 @@ public class PathController {
         this.eps = 1.2;
     }
 
+    public boolean isArrivedToAim() {
+        if (aim == null) {
+            return true;
+        } else {
+            double ax = toDoubleValue(aim.x);
+            double ay = toDoubleValue(aim.y);
+            return Math.sqrt((ax - unit.getX()) * (ax - unit.getX())
+                    + (ay - unit.getY()) * (ay - unit.getY())) < eps;
+        }
+    }
+
     public boolean isRedef() {
         return redef;
     }
@@ -39,7 +56,35 @@ public class PathController {
         this.redef = redef;
     }
 
-    public void distPath(Unit unit, Cell aim) {
+    public Cell findNearPosition(List<Cell> cells) {
+        if (cells == null) {
+            return null;
+        }
+        int ux = (int) (unit.getX() / grid.cellSize);
+        int uy = (int) (unit.getY() / grid.cellSize);
+        Cell c = Algorithm.searchNearPosition(ux, uy, unit, cells);
+        if (c != null) {
+            System.out.println("NEAR_CELL - " + c.key);
+        } else {
+            System.out.println("NEAR_CELL - NULL");
+        }
+        return c;
+    }
+
+    public Cell getAim() {
+        return aim;
+    }
+
+    public Cell availableCell(int distance) {
+        int ux = (int) (unit.getX() / grid.cellSize);
+        int uy = (int) (unit.getY() / grid.cellSize);
+        return Algorithm.searchAvailableDistance(ux, uy, unit.getSize(), distance);
+    }
+
+    public void distPath(Cell aim) {
+        if (aim == null) {
+            return;
+        }
         this.aim = aim;
 
         int ux = (int) (unit.getX() / grid.cellSize);
@@ -56,6 +101,9 @@ public class PathController {
      * @param aim
      */
     public void definePath(Cell aim) {
+        if (aim == null) {
+            return;
+        }
         this.aim = aim;
 
         int size = unit.getSize();
@@ -87,7 +135,7 @@ public class PathController {
 
     public void redef() {
         System.out.println("REDEFINIG AIM:" + aim.key);
-        definePathWithUnit(aim);
+        distPath(aim);
     }
 
     public void definePathWithUnit(Cell aim) {

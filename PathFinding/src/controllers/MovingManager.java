@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package controllers;
 
 import grid.Grid;
@@ -8,7 +13,7 @@ import units.Unit;
 
 /**
  *
- * @author Хозяин
+ * @author Sokolov@ivc.org
  */
 public class MovingManager {
 

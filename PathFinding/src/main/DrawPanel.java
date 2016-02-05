@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package main;
 
 import advancedpathfinding.Algorithm;
@@ -20,7 +25,7 @@ import units.Unit;
 
 /**
  *
- * @author Хозяин
+ * @author Sokolov@ivc.org
  */
 public class DrawPanel extends JComponent implements Runnable {
 
@@ -38,6 +43,7 @@ public class DrawPanel extends JComponent implements Runnable {
     private Unit gu;
     private Unit u;
     private UnitManager manager;
+    private UnitManager guManager;
 
     private volatile boolean isLoad = false;
 
@@ -101,7 +107,7 @@ public class DrawPanel extends JComponent implements Runnable {
         isLoad = true;
         MovingManager.setGrid(grid);
         manager = MovingManager.addUnit(u);
-        MovingManager.addUnit(gu);
+        guManager = MovingManager.addUnit(gu);
         while (true) {
             repaint();
             try {
@@ -110,11 +116,18 @@ public class DrawPanel extends JComponent implements Runnable {
                 Logger.getLogger(DrawPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
             long t = System.currentTimeMillis();
-            u.setSize(size);
-            grid.setNullUnit(u);
+            if (u.getSize() != size) {
+                grid.setNullUnit(u);
+                u.setSize(size);
+                grid.setUnit(u);
+            }
             if (aim != null) {
                 manager.addAim(aim);
                 aim = null;
+            }
+            if (guManager.isArrivedToAim()) {
+                System.out.println("DEFINE SOME PATH");
+                guManager.addAim(guManager.getAvailableCell());
             }
             // manager.execute();
             MovingManager.execute();
@@ -140,23 +153,40 @@ public class DrawPanel extends JComponent implements Runnable {
         g2d.setStroke(pen1);
         grid.draw(g2d, size);
 
-        Cell curCell = manager.getCell();
+        drawManagerPath(g, manager, Color.RED);
+
+        drawManagerPath(g, guManager, Color.CYAN);
+
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("Время расчёта: " + (float) calcTime / 1000 + "сек.", 620, 55);
+        g2d.drawString("Время предрасчёта путей: " + (float) loadTime / 1000 + " сек.", 220, 620);
+        MovingManager.drawUnits(g2d);
+    }
+
+    private void drawManagerPath(Graphics g, UnitManager mnr, Color color) {
+        Graphics2D g2d = (Graphics2D) g;
+
+        BasicStroke pen1;
+        pen1 = new BasicStroke(1);
+        g2d.setStroke(pen1);
+
+        Cell curCell = mnr.getCell();
         while (curCell != null) {
             pen1 = new BasicStroke(1);
             g2d.setStroke(pen1);
-            g2d.setColor(Color.RED);
+            g2d.setColor(color);
             g2d.drawRect(curCell.x * grid.cellSize + 2, curCell.y * grid.cellSize + 2, grid.cellSize - 4, grid.cellSize - 4);
             curCell = curCell.getCell();
         }
 
-        Leaf curLeaf = manager.getLeaf();
+        Leaf curLeaf = mnr.getLeaf();
         Leaf tmp = null;
 
         while (curLeaf != null) {
             tmp = curLeaf;
             if (curLeaf.getLeaf() != null) {
                 Cell c;
-                if (manager.getLeaf() != null) {
+                if (mnr.getLeaf() != null) {
                     int x0 = curLeaf.node.x;
                     int y0 = curLeaf.node.y;
                     int x = curLeaf.getLeaf().node.x;
@@ -165,7 +195,7 @@ public class DrawPanel extends JComponent implements Runnable {
                     while (c != null) {
                         pen1 = new BasicStroke(1);
                         g2d.setStroke(pen1);
-                        g2d.setColor(Color.RED);
+                        g2d.setColor(color);
                         g2d.drawRect(c.x * grid.cellSize + 2, c.y * grid.cellSize + 2, grid.cellSize - 4, grid.cellSize - 4);
                         c = c.getCell();
                     }
@@ -180,11 +210,6 @@ public class DrawPanel extends JComponent implements Runnable {
             }
             curLeaf = curLeaf.getLeaf();
         }
-
-        g2d.setColor(Color.BLACK);
-        g2d.drawString("Время расчёта: " + (float) calcTime / 1000 + "сек.", 620, 55);
-        g2d.drawString("Время предрасчёта путей: " + (float) loadTime / 1000 + " сек.", 220, 620);
-        MovingManager.drawUnits(g2d);
     }
 
 }
